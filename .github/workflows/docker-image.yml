@@ -1,0 +1,27 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Docker login
+      run: |
+        docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_TOKEN}}
+    - name: Build the Docker image
+      env:
+        IMAGE: keli/seafile-client
+      run: |
+        docker build . --file Dockerfile --tag $IMAGE:$(date +%s) --tag $IMAGE:latest
+    - name: Docker publish
+      run: docker push keli/seafile-client
