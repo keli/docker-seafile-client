@@ -5,6 +5,7 @@ See docker-compose how to use.
 
 ## Environment variables:
  - LIBRARY_ID=your-library-id-here   Can be multiple library ids seperated with colon :
+ - LIBRARY_PASSWORD=your-library-password-here   Can be multiple library passwords seperated with colon :
  - SERVER_URL=server-url             The url used to access your server, eg: https://example.seafile.com
  - SERVER_PORT=server-port           Which port the server is hosted on: usually 443 (https) or 80 (http)
  - USERNAME=username                 Your account username (credentials)

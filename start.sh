@@ -60,9 +60,11 @@ setup_lib_sync(){
     fi
     LIBS_IN_SYNC=$(su - seafile -c 'seaf-cli list')
     LIBS=(${LIBRARY_ID//:/ })
+    IFS=':' read -ra LIB_PWDS <<< "$LIBRARY_PASSWORD"
     for i in "${!LIBS[@]}"
     do
       LIB="${LIBS[i]}"
+      LIB_PWD="${LIB_PWDS[i]}"
       LIB_JSON=$(curl -G -H "Authorization: Token $TOKEN" -H 'Accept: application/json; indent=4' ${SERVER_URL}:${SERVER_PORT}/api2/repos/${LIB}/ 2> /dev/null)
       LIB_NAME=$(get name "$LIB_JSON")
       LIB_NAME_NO_SPACE=$(echo $LIB_NAME|sed 's/[ \(\)]/_/g')
@@ -74,7 +76,11 @@ setup_lib_sync(){
         echo "Syncing $LIB_NAME"
         mkdir -p $LIB_DIR
         chown seafile:seafile -R $LIB_DIR
-        su - seafile -c "seaf-cli sync -l \"\"$LIB\"\" -s \"${SERVER_URL}:${SERVER_PORT}\" -d \"$LIB_DIR\" -u \"$USERNAME\" -p \"$PASSWORD\""
+        if [ -z "$LIB_PWD" ]; then
+          su - seafile -c "seaf-cli sync -l \"\"$LIB\"\" -s \"${SERVER_URL}:${SERVER_PORT}\" -d \"$LIB_DIR\" -u \"$USERNAME\" -p \"$PASSWORD\""
+        else
+          su - seafile -c "seaf-cli sync -l \"\"$LIB\"\" -s \"${SERVER_URL}:${SERVER_PORT}\" -d \"$LIB_DIR\" -u \"$USERNAME\" -p \"$PASSWORD\" -e \"$LIB_PWD\""
+        fi
       fi
     done
 }
